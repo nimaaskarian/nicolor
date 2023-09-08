@@ -3,7 +3,20 @@
 #include <stdexcept>
 #include <cmath>
 #include <nicolor.h>
+#define rgb8IsInvalid(P) ((P) > (255) || (P) < (0))
 
+Color::Color() 
+{
+}
+Color Color::fromSRgb(double r, double g, double b)
+{
+  Color c;
+  c.r = r;
+  c.g = g;
+  c.b = b;
+
+  return c;
+}
 Color Color::fromStr(std::string cssColor)
 {
   int r,g,b;
@@ -23,6 +36,8 @@ Color Color::fromStr(std::string cssColor)
 
 Color Color::fromRgb8(int r, int g, int b)
 {
+  if (rgb8IsInvalid(r) || rgb8IsInvalid(g) || rgb8IsInvalid(b))
+    throw std::runtime_error("Invalid RGB color. P <= 255 and P > 0.");
   Color c;
   c.r = (double)r/255;
   c.g = (double)g/255;
@@ -61,10 +76,10 @@ double Color::relativeLuma()
   return 0.2126*r + 0.7152*g + 0.0722 * b;
 }
 
-double Color::contrastRatio(Color &obj)
+double Color::contrastRatio(Color obj)
 {
   double luma1 = relativeLuma();
-  double luma2 = relativeLuma();
+  double luma2 = obj.relativeLuma();
 
   if (luma1>luma2)
      return ( luma1 +0.05 )/( luma2 +0.05);
@@ -91,7 +106,7 @@ Color Color::operator+(Color &obj)
   return output;
 }
 
-bool Color::operator==(Color obj) const
+bool Color::operator==(Color const &obj) const
 {
   if (r == obj.r && g == obj.g && b == obj.b)
     return true;

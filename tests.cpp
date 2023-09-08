@@ -25,5 +25,20 @@ TEST(fromStrTest, handleErrors) {
   EXPECT_THROW(Color::fromStr("ffffff"),std::runtime_error);
   // not 6 or 3 digits
   EXPECT_THROW(Color::fromStr("#ffff"),std::runtime_error);
+}
 
+TEST(fromRgb8Test, handleValids) {
+  ASSERT_EQ(Color::fromRgb8(10,10,10),Color::fromSRgb(0.039215686274509803,0.039215686274509803,0.039215686274509803));
+  ASSERT_EQ(Color::fromRgb8(0,0,0),Color::fromSRgb(0, 0, 0));
+  ASSERT_EQ(Color::fromRgb8(255,255,255),Color::fromSRgb(1, 1, 1));
+}
+TEST(fromRgb8Test, handleInvalids) {
+  EXPECT_THROW(Color::fromRgb8(-1,-1,-1),std::runtime_error);
+  EXPECT_THROW(Color::fromRgb8(256,256,256),std::runtime_error);
+}
+
+TEST(relativeLumaTest, caluclatesRight) {
+  ASSERT_EQ(Color::fromRgb8(255, 255, 255).contrastRatio(Color::fromRgb8(0,0,0)), 21.0);
+  ASSERT_EQ(Color::fromRgb8(0,0,0).contrastRatio(Color::fromRgb8(0,0,0)), 1.0);
+  ASSERT_EQ(Color::fromStr("#8d4444").contrastRatio(Color::fromRgb8(0,0,0)), 3.0428639462706979);
 }
