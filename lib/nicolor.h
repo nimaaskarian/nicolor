@@ -4,8 +4,8 @@
 #include <array>
 
 class Color {
-public:
   double r=0,g=0,b=0;
+public:
   static Color fromRgb8(int r,int g,int b);
   static Color fromStr(std::string cssColor);
   static Color fromSRgb(double r, double g, double b);
@@ -15,12 +15,17 @@ public:
   std::string toStr();
 
 
-  bool operator ==(Color const &obj) const;
-  Color operator +(Color &obj);
+  bool equals(const Color obj);
+  // friend bool operator ==(const Color obj1,const Color obj2) ;
+  Color operator +(Color obj);
+  Color operator *(double x);
 
   double relativeLumaFix(double p);
   double relativeLuma();
   double contrastRatio(Color obj);
-  
+
+  void lighten(double percentage);
+  void darken(double percentage);
+
 };
 #endif // !COLOR_HPP

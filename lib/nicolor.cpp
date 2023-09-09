@@ -2,8 +2,10 @@
 #include <stdio.h>
 #include <stdexcept>
 #include <cmath>
-#include <nicolor.h>
-#define rgb8IsInvalid(P) ((P) > (255) || (P) < (0))
+#include "nicolor.h"
+#include <tuple>
+#define PARAM_NOT_BETWEEN(P,MIN,MAX) ((P) > (MAX) || (P) < (MIN))
+#define rgb8IsInvalid(P) PARAM_NOT_BETWEEN(P,0,255)
 
 Color::Color() 
 {
@@ -46,6 +48,27 @@ Color Color::fromRgb8(int r, int g, int b)
   return c;
 }
 
+void Color::lighten(double percentage)
+{
+  if (PARAM_NOT_BETWEEN(percentage, 0, 100))
+    throw std::runtime_error("Percentage is invalid (Must be between 0 and 100)");
+
+  double rToWhite = 1 - r;
+  double gToWhite = 1 - g;
+  double bToWhite = 1 - b;
+
+  *this = *this+Color::fromSRgb(rToWhite, gToWhite, bToWhite)*(percentage/100);
+}
+
+void Color::darken(double percentage)
+{
+  if (PARAM_NOT_BETWEEN(percentage, 0, 100))
+    throw std::runtime_error("Percentage is invalid (Must be between 0 and 100)");
+
+  percentage = 100-percentage;
+  *this = Color::fromSRgb(r, g, b)*(percentage/100);
+}
+
 std::array<int, 3> Color::toRgb8()
 {
   std::array<int, 3> output;
@@ -65,6 +88,8 @@ double Color::relativeLumaFix(double p)
 
   return p;
 }
+
+
 
 double Color::relativeLuma()
 {
@@ -92,11 +117,19 @@ std::string Color::toStr()
   std::array<int, 3> rgb8 = toRgb8();
   char *c_str = new char[8];
   snprintf(c_str, 8, "#%02x%02x%02x", rgb8[0],rgb8[1],rgb8[2]);
-  std::cout << rgb8[2];
   return std::string(c_str);
 }
+Color Color::operator *(double x)
+{
+  Color c = Color::fromSRgb(r, g, b);
+  c.r*=x;
+  c.g*=x;
+  c.b*=x;
 
-Color Color::operator+(Color &obj)
+  return c;
+}
+
+Color Color::operator+(Color obj)
 {
   Color output;
   output.r = this->r + obj.r;
@@ -106,11 +139,9 @@ Color Color::operator+(Color &obj)
   return output;
 }
 
-bool Color::operator==(Color const &obj) const
+bool Color::equals(Color obj)
 {
-  if (r == obj.r && g == obj.g && b == obj.b)
+  if (toRgb8() == obj.toRgb8())
     return true;
-
   return false;
 }
-
