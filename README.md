@@ -1,5 +1,5 @@
 # Nicolor
-Nicolor is a color manipulation library written in c++.
+Nicolor is a color manipulation library and CLI tool written in C++.
 As I don't know how to name stuff, I just add **Ni** to it and call it a day.  
 
 ## What this actually is
