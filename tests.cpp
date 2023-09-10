@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <nicolor.h>
+#include <vector>
 
 int main (int argc, char *argv[]) 
 {
@@ -55,4 +56,16 @@ TEST(ContrastRatioTest, CaluclatesRight) {
   ASSERT_EQ(Color::fromRgb8(255, 255, 255).contrastRatio(Color::fromRgb8(0,0,0)), 21.0);
   ASSERT_EQ(Color::fromRgb8(0,0,0).contrastRatio(Color::fromRgb8(0,0,0)), 1.0);
   ASSERT_EQ(Color::fromStr("#8d4444").contrastRatio(Color::fromRgb8(0,0,0)), 3.0428639462706979);
+}
+
+TEST(ColorsToTest, CalculatesRight)
+{
+  std::vector<Color> tests = {
+    Color::fromStr("#2a2a2a"), Color::fromStr("#555555"),
+    Color::fromStr("#7f7f7f"), Color::fromStr("#aaaaaa"),
+    Color::fromStr("#d4d4d4"),
+  };
+  std::vector<Color> output = Color::fromStr("#fff").colorsTo(Color::fromStr("#000"));
+  
+  ASSERT_TRUE(tests == output);
 }

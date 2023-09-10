@@ -12,10 +12,8 @@ add_executable(test tests.cpp)
 add_executable(${EXEC} main.cpp)
 
 install(TARGETS ${LIB}
-  EXPORT ${LIB}
-        LIBRARY DESTINATION ${INSTALL_DIR}
-        ARCHIVE DESTINATION ${INSTALL_DIR}
-        RUNTIME DESTINATION ${INSTALL_DIR})
+        EXPORT ${LIB}
+        LIBRARY DESTINATION ${CMAKE_CURRENT_SOURCE_DIR})
 
 install(DIRECTORY lib/
   DESTINATION "${CMAKE_INSTALL_PREFIX}/include"

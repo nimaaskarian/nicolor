@@ -1,15 +1,14 @@
 #include <iostream>
+#include <sstream>
 #include <stdio.h>
 #include <stdexcept>
 #include <cmath>
-#include "nicolor.h"
+#include <vector>
+#include <nicolor.h>
 #include <tuple>
 #define PARAM_NOT_BETWEEN(P,MIN,MAX) ((P) > (MAX) || (P) < (MIN))
 #define rgb8IsInvalid(P) PARAM_NOT_BETWEEN(P,0,255)
 
-Color::Color() 
-{
-}
 Color Color::fromSRgb(double r, double g, double b)
 {
   Color c;
@@ -69,7 +68,7 @@ void Color::darken(double percentage)
   *this = Color::fromSRgb(r, g, b)*(percentage/100);
 }
 
-std::array<int, 3> Color::toRgb8()
+std::array<int, 3> Color::toRgb8() const
 {
   std::array<int, 3> output;
   output[0] = (int)( r*255 );
@@ -129,6 +128,16 @@ Color Color::operator *(double x)
   return c;
 }
 
+Color Color::operator /(double x)
+{
+  Color c = Color::fromSRgb(r, g, b);
+  c.r/=x;
+  c.g/=x;
+  c.b/=x;
+
+  return c;
+}
+
 Color Color::operator+(Color obj)
 {
   Color output;
@@ -139,9 +148,54 @@ Color Color::operator+(Color obj)
   return output;
 }
 
-bool Color::equals(Color obj)
+Color Color::operator-(Color obj)
+{
+  Color output;
+  output.r = this->r - obj.r;
+  output.g = this->g - obj.g;
+  output.b = this->b - obj.b;
+
+  return output;
+}
+
+std::vector<Color> Color::colorsTo(Color to, std::size_t size)
+{
+  size++;
+  Color dif = (to - *this)/size;
+  std::vector<Color> output;
+
+  for (int i = 1; i < size; i++) {
+    output.push_back(*this + dif*i);
+  }
+
+  return output;
+}
+bool Color::equals(Color obj) const
 {
   if (toRgb8() == obj.toRgb8())
     return true;
   return false;
+}
+
+bool Color::operator==(Color obj) const
+{
+  return equals(obj);
+}
+
+std::string Color::terminalBackground()
+{
+  std::array<int, 3> rgb8 = toRgb8();
+  std::stringstream sstream;
+  sstream << "\e[48:2::" << rgb8[0] << ':' << rgb8[1] << ':' << rgb8[2] << 'm';
+
+  return sstream.str();
+}
+
+std::string Color::terminalForeground()
+{
+  std::array<int, 3> rgb8 = toRgb8();
+  std::stringstream sstream;
+  sstream << "\e[38:2::" << rgb8[0] << ':' << rgb8[1] << ':' << rgb8[2] << 'm';
+
+  return sstream.str();
 }
