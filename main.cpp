@@ -47,9 +47,9 @@ int main (int argc, char *argv[])
         fflag = true;
       break;
       case 't':
-          toColor = Color::fromStr(optarg);
-          tflag = true;
-        break;
+        toColor = Color::fromStr(optarg);
+        tflag = true;
+      break;
       case 'c':
         sscanf(optarg, "%lu", &colorsCount);
         tflag = true;

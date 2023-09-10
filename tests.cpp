@@ -60,12 +60,12 @@ TEST(ContrastRatioTest, CaluclatesRight) {
 
 TEST(ColorsToTest, CalculatesRight)
 {
-  std::vector<Color> tests = {
+  std::vector<Color> testsVec = {
     Color::fromStr("#2a2a2a"), Color::fromStr("#555555"),
     Color::fromStr("#7f7f7f"), Color::fromStr("#aaaaaa"),
     Color::fromStr("#d4d4d4"),
   };
-  std::vector<Color> output = Color::fromStr("#fff").colorsTo(Color::fromStr("#000"));
+  std::vector<Color> outputVec = Color::fromStr("#000").colorsTo(Color::fromStr("#fff"), 5);
   
-  ASSERT_TRUE(tests == output);
+  ASSERT_TRUE(testsVec == outputVec);
 }
