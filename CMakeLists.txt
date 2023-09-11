@@ -22,10 +22,23 @@ install(DIRECTORY lib/
 install(TARGETS ${EXEC}
         DESTINATION bin)
 
-target_compile_features(test PUBLIC cxx_std_17)
-target_link_libraries(test PUBLIC gtest ${LIB})
-target_link_libraries(${EXEC} PUBLIC gtest ${LIB})
+include(FetchContent)
+FetchContent_Declare(
+  fmt
+  GIT_REPOSITORY https://github.com/fmtlib/fmt.git
+)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+)
+FetchContent_MakeAvailable(fmt googletest)
 
-target_link_libraries(${LIB} PUBLIC gtest)
-target_include_directories(${LIB} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+target_link_libraries(${LIB} PUBLIC googletest fmt)
 target_compile_features(${LIB} PUBLIC cxx_std_17)
+target_include_directories(${LIB} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib)
+
+target_compile_features(test PRIVATE cxx_std_17)
+target_link_libraries(test PRIVATE googletest ${LIB})
+target_link_libraries(${EXEC} PRIVATE googletest ${LIB})
+target_compile_features(${EXEC} PRIVATE cxx_std_17)
+

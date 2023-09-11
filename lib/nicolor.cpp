@@ -5,7 +5,9 @@
 #include <cmath>
 #include <vector>
 #include <nicolor.h>
+#include <fmt/format.h>
 #include <tuple>
+
 #define PARAM_NOT_BETWEEN(P,MIN,MAX) ((P) > (MAX) || (P) < (MIN))
 #define rgb8IsInvalid(P) PARAM_NOT_BETWEEN(P,0,255)
 
@@ -32,7 +34,7 @@ Color Color::fromStr(std::string cssColor)
 
   }
 
-  throw std::runtime_error("Invalid css color");
+  throw std::runtime_error(fmt::format("Invalid css color: {}", cssColor));
 }
 
 Color Color::fromRgb8(int r, int g, int b)
@@ -50,7 +52,7 @@ Color Color::fromRgb8(int r, int g, int b)
 void Color::lighten(double percentage)
 {
   if (PARAM_NOT_BETWEEN(percentage, 0, 100))
-    throw std::runtime_error("Percentage is invalid (Must be between 0 and 100)");
+    throw std::runtime_error(fmt::format("Percentage '{}' is invalid (Must be between 0 and 100)", percentage));
 
   double rToWhite = 1 - r;
   double gToWhite = 1 - g;
@@ -184,18 +186,10 @@ bool Color::operator==(Color obj) const
 
 std::string Color::terminalBackground()
 {
-  std::array<int, 3> rgb8 = toRgb8();
-  std::stringstream sstream;
-  sstream << "\e[48:2::" << rgb8[0] << ':' << rgb8[1] << ':' << rgb8[2] << 'm';
-
-  return sstream.str();
+  return fmt::format("\e[48:2::{}m", fmt::join(toRgb8(), ":"));
 }
 
 std::string Color::terminalForeground()
 {
-  std::array<int, 3> rgb8 = toRgb8();
-  std::stringstream sstream;
-  sstream << "\e[38:2::" << rgb8[0] << ':' << rgb8[1] << ':' << rgb8[2] << 'm';
-
-  return sstream.str();
+  return fmt::format("\e[38:2::{}m", fmt::join(toRgb8(), ":"));
 }

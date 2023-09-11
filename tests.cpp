@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <gtest/gtest.h>
 #include <nicolor.h>
 #include <vector>
@@ -65,7 +66,10 @@ TEST(ColorsToTest, CalculatesRight)
     Color::fromStr("#7f7f7f"), Color::fromStr("#aaaaaa"),
     Color::fromStr("#d4d4d4"),
   };
-  std::vector<Color> outputVec = Color::fromStr("#000").colorsTo(Color::fromStr("#fff"), 5);
+  std::vector<Color> blackToWhite = Color::fromStr("#000").colorsTo(Color::fromStr("#fff"), 5);
+  std::vector<Color> whiteToBlack = Color::fromStr("#fff").colorsTo(Color::fromStr("#000"), 5);
   
-  ASSERT_TRUE(testsVec == outputVec);
+  ASSERT_TRUE(testsVec == blackToWhite);
+  std::reverse(testsVec.begin(), testsVec.end());
+  ASSERT_TRUE(testsVec == whiteToBlack);
 }

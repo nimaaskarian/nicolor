@@ -7,7 +7,12 @@ This is just a recap of what I know from C/C++ and a farewell (not really, but I
 With learning unit tests and TDD in this beautiful language, and how to use CMake thanks to my friend [sepehr](https://github.com/Sephixum).
 
 ## Installation
-Commands below will compile and install `nicmd` and `nicolor` library.  
+Nicolor will install and build this dependencies. So try to have a internet connection!
+### dependencies
+- [fmt](https://github.com/fmtlib/fmt)  
+- [Google Tests](https://github.com/google/googletest)  
+
+Use the commands below will compile and install `nicmd` and `nicolor` library.  
 ```
 cmake -S . -B build
 cmake --build build

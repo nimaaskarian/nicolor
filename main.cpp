@@ -1,14 +1,11 @@
 #include <unistd.h>
-#include <iostream>
 #include <stdio.h>
+#include <iostream>
 #include <nicolor.h>
+#include <fmt/format.h>
 
-void printColor(Color &currentColor, bool raw)
+void printColor(Color &currentColor)
 {
-  if (raw) {
-    std::cout << currentColor.toStr() << '\n';
-    return;
-  }
   Color white = Color::fromSRgb(1,1,1);
   Color black = Color::fromSRgb(0,0,0);
   Color foregroundColor = white;
@@ -16,9 +13,22 @@ void printColor(Color &currentColor, bool raw)
   if (currentColor.contrastRatio(white) < currentColor.contrastRatio(black)) 
     foregroundColor = black;
 
-  std::cout << foregroundColor.terminalForeground()
-    << currentColor.terminalBackground() << currentColor.toStr() 
-    << Color::backgroundEnd << Color::foregroundEnd << '\n';
+  fmt::print("{}{}{}{}{}\n", foregroundColor.terminalForeground(), currentColor.terminalBackground(), 
+             currentColor.toStr(), Color::backgroundEnd, Color::foregroundEnd);
+}
+
+void printRaw(Color &currentColor)
+{
+  fmt::print("{}\n", currentColor.toStr());
+}
+
+void printNoText(Color &currentColor)
+{
+  fmt::print("{}       {}\n",currentColor.terminalBackground(), Color::backgroundEnd);
+}
+
+void rflagNflagBothExists() {
+  fmt::system_error(1,"Can't use both r and n flags at the same time.\n");
 }
 
 int main (int argc, char *argv[]) 
@@ -26,9 +36,9 @@ int main (int argc, char *argv[])
   int ch;
   double lightenPercentage = 0, darkenPercentage = 0;
   std::size_t colorsCount = 20;
-  bool fflag{}, tflag{}, rflag{};
+  bool fflag{}, tflag{}, rflag{}, nflag;
   Color fromColor, toColor;
-  while ((ch = getopt(argc, argv , "l:d:f:t:c:r")) != -1) {
+  while ((ch = getopt(argc, argv , "l:d:f:t:c:rn")) != -1) {
     switch (ch) {
       case 'l':
         sscanf(optarg, "%lf", &lightenPercentage);
@@ -36,11 +46,17 @@ int main (int argc, char *argv[])
       case 'd':
         sscanf(optarg, "%lf", &darkenPercentage);
         break;
-      // case 's':
-      //   std::cout << argc - optind  << '\n';
-      // break;
       case 'r':
+        if (nflag) {
+          rflagNflagBothExists();
+        }
         rflag = true;
+      break;
+      case 'n':
+        if (rflag) {
+          rflagNflagBothExists();
+        }
+        nflag = true;
       break;
       case 'f':
         fromColor = Color::fromStr(optarg);
@@ -78,7 +94,15 @@ int main (int argc, char *argv[])
   for (auto color: colors) {
     color.lighten(lightenPercentage);
     color.darken(darkenPercentage);
-    printColor(color, rflag);
+    if (rflag) {
+      printRaw(color);
+      continue;
+    }
+    if (nflag) {
+      printNoText(color);
+      continue;
+    }
+    printColor(color);
   }
   return 0;
 }
