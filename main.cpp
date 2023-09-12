@@ -1,3 +1,4 @@
+// #include <fmt/core.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <iostream>
@@ -68,7 +69,6 @@ int main (int argc, char *argv[])
       break;
       case 'c':
         sscanf(optarg, "%lu", &colorsCount);
-        tflag = true;
       break;
       case '?':
         printf("?\n");
@@ -89,6 +89,15 @@ int main (int argc, char *argv[])
 
   for (int i = optind; i < argc; i++) {
     colors.push_back(Color::fromStr(argv[i]));
+  }
+
+  // if its pipe read the stdin untill the end
+  if (!isatty(fileno(stdin))) {
+    std::string lineInput;
+    while (getline(std::cin,lineInput)) {
+      if (lineInput.length())
+        colors.push_back(Color::fromStr(lineInput));
+    }
   }
 
   for (auto color: colors) {

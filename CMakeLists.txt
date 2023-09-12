@@ -28,17 +28,17 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/fmtlib/fmt.git
 )
 FetchContent_Declare(
-  googletest
+  gtest
   URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
 )
-FetchContent_MakeAvailable(fmt googletest)
+FetchContent_MakeAvailable(fmt gtest)
 
-target_link_libraries(${LIB} PUBLIC googletest fmt)
+target_link_libraries(${LIB} PRIVATE gtest fmt)
 target_compile_features(${LIB} PUBLIC cxx_std_17)
 target_include_directories(${LIB} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 target_compile_features(test PRIVATE cxx_std_17)
-target_link_libraries(test PRIVATE googletest ${LIB})
-target_link_libraries(${EXEC} PRIVATE googletest ${LIB})
+target_link_libraries(test PRIVATE gtest ${LIB})
+target_link_libraries(${EXEC} PRIVATE gtest ${LIB})
 target_compile_features(${EXEC} PRIVATE cxx_std_17)
 

@@ -72,4 +72,17 @@ TEST(ColorsToTest, CalculatesRight)
   ASSERT_TRUE(testsVec == blackToWhite);
   std::reverse(testsVec.begin(), testsVec.end());
   ASSERT_TRUE(testsVec == whiteToBlack);
+  std::vector<Color> testsVec2 = {
+    Color::fromStr("#f2f2f2"), Color::fromStr("#e6e6e6"),
+    Color::fromStr("#dadada"), Color::fromStr("#cecece"),
+    Color::fromStr("#c2c2c2"), Color::fromStr("#b6b6b6"),
+    Color::fromStr("#aaaaaa"), Color::fromStr("#9d9d9d"),
+    Color::fromStr("#919191"), Color::fromStr("#858585"),
+    Color::fromStr("#797979"), Color::fromStr("#6d6d6d"),
+    Color::fromStr("#616161"), Color::fromStr("#555555"),
+    Color::fromStr("#484848"), Color::fromStr("#3c3c3c"),
+    Color::fromStr("#303030"), Color::fromStr("#242424"),
+    Color::fromStr("#181818"), Color::fromStr("#0c0c0c"),
+  };
+  std::vector<Color> whiteToBlack2 = Color::fromStr("#fff").colorsTo(Color::fromStr("#000"),20);
 }

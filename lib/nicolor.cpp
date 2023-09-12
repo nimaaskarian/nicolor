@@ -115,10 +115,8 @@ double Color::contrastRatio(Color obj)
 
 std::string Color::toStr()
 {
-  std::array<int, 3> rgb8 = toRgb8();
-  char *c_str = new char[8];
-  snprintf(c_str, 8, "#%02x%02x%02x", rgb8[0],rgb8[1],rgb8[2]);
-  return std::string(c_str);
+  auto rgb8 = toRgb8();
+  return fmt::format("#{:02X}{:02X}{:02X}",rgb8[0],rgb8[1],rgb8[2]);
 }
 Color Color::operator *(double x)
 {
