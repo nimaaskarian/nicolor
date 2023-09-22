@@ -15,12 +15,12 @@ void printColor(Color &currentColor)
     foregroundColor = black;
 
   fmt::print("{}{}{}{}{}\n", foregroundColor.terminalForeground(), currentColor.terminalBackground(), 
-             currentColor.toStr(), Color::backgroundEnd, Color::foregroundEnd);
+             currentColor.toRgbStr(), Color::backgroundEnd, Color::foregroundEnd);
 }
 
 void printRaw(Color &currentColor)
 {
-  fmt::print("{}\n", currentColor.toStr());
+  fmt::print("{}\n", currentColor.toRgbStr());
 }
 
 void printNoText(Color &currentColor)
@@ -87,6 +87,7 @@ int main (int argc, char *argv[])
     colors = fromColor.colorsTo(toColor, colorsCount);
   }
 
+  colors.reserve(argc - optind);
   for (int i = optind; i < argc; i++) {
     colors.push_back(Color::fromStr(argv[i]));
   }
@@ -95,7 +96,7 @@ int main (int argc, char *argv[])
   if (!isatty(fileno(stdin))) {
     std::string lineInput;
     while (getline(std::cin,lineInput)) {
-      if (lineInput.length())
+      if (!lineInput.empty())
         colors.push_back(Color::fromStr(lineInput));
     }
   }

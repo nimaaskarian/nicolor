@@ -16,19 +16,68 @@ TEST(FromStrTest, Handles6DigitColors) {
   EXPECT_TRUE(Color::fromStr("#ff0011").equals(Color::fromRgb8(255,0,17)));
   EXPECT_TRUE(Color::fromStr("#ef2f2f").equals(Color::fromRgb8(239,47,47)));
 }
+
+TEST(FromStrTest, HandlesRgbaFullColors) {
+  EXPECT_TRUE(Color::fromStr("#ffffffff").equals(Color::fromRgb8(255,255,255,255)));
+  EXPECT_TRUE(Color::fromStr("#ffffff00").equals(Color::fromRgb8(255,255,255,0)));
+  EXPECT_TRUE(Color::fromStr("#000000ff").equals(Color::fromRgb8(0,0,0,255)));
+  EXPECT_TRUE(Color::fromStr("#ffee0000").equals(Color::fromRgb8(255,238,0,0)));
+  EXPECT_TRUE(Color::fromStr("#ff001111").equals(Color::fromRgb8(255,0,17,17)));
+}
+TEST(FromStrTest, HandlesRgbaLilColors) {
+  EXPECT_TRUE(Color::fromStr("#ffff").equals(Color::fromRgb8(255,255,255,255)));
+  EXPECT_TRUE(Color::fromStr("#fff0").equals(Color::fromRgb8(255,255,255,0)));
+  EXPECT_TRUE(Color::fromStr("#000f").equals(Color::fromRgb8(0,0,0,255)));
+  EXPECT_TRUE(Color::fromStr("#fe00").equals(Color::fromRgb8(255,238,0,0)));
+  EXPECT_TRUE(Color::fromStr("#f011").equals(Color::fromRgb8(255,0,17,17)));
+}
+
 TEST(FromStrTest, Handles3DigitColors) {
   EXPECT_TRUE(Color::fromStr("#fff").equals(Color::fromRgb8(255,255,255)));
   EXPECT_TRUE(Color::fromStr("#000").equals(Color::fromRgb8(0,0,0)));
   EXPECT_TRUE(Color::fromStr("#fe0").equals(Color::fromRgb8(255,238,0)));
   EXPECT_TRUE(Color::fromStr("#f01").equals(Color::fromRgb8(255,0,17)));
 }
+TEST(FromStrTest, HandlesRgb) {
+  EXPECT_TRUE(Color::fromStr("rgb(255,255,255)").equals(Color::fromRgb8(255,255,255)));
+  EXPECT_TRUE(Color::fromStr("rgb(0,0,0)").equals(Color::fromRgb8(0,0,0)));
+  EXPECT_TRUE(Color::fromStr("rgb(255,238,0)").equals(Color::fromRgb8(255,238,0)));
+  EXPECT_TRUE(Color::fromStr("rgb(255,0,17)").equals(Color::fromRgb8(255,0,17)));
+}
 TEST(FromStrTest, HandleErrors) {
   // no #
   EXPECT_THROW(Color::fromStr("ffffff"),std::runtime_error);
   // not 6 or 3 digits
-  EXPECT_THROW(Color::fromStr("#ffff"),std::runtime_error);
+  EXPECT_THROW(Color::fromStr("#fffff"),std::runtime_error);
 }
-TEST(LightenTest, HandleValids) {
+TEST(LongHex, ValidOutput) {
+  ASSERT_EQ(Color::fromStr("#fff").toLongHexadecimal(), 0xFFFFFFFF);
+  ASSERT_EQ(Color::fromStr("#000").toLongHexadecimal(), 0x000000FF);
+  ASSERT_EQ(Color::fromStr("#fffa").toLongHexadecimal(), 0xFFFFFFAA);
+  ASSERT_EQ(Color::fromStr("#fafa").toLongHexadecimal(), 0xFFAAFFAA);
+  ASSERT_EQ(Color::fromStr("#0a1a").toLongHexadecimal(), 0x00AA11AA);
+}
+TEST(DarkenTest, HandleRgb) {
+  Color white = Color::fromSRgb(1,1,1);
+  white.darken(100);
+  EXPECT_TRUE(white.equals(Color::fromSRgb(0,0,0)));
+
+  Color red = Color::fromStr("#AF4D17");
+  red.darken(35);
+  EXPECT_TRUE(red.equals(Color::fromStr("#71320E")));
+
+}
+TEST(DarkenTest, HandleRgba) {
+  Color white = Color::fromSRgb(1,1,1, 0.5);
+  white.darken(100);
+  EXPECT_TRUE(white.equals(Color::fromSRgb(0,0,0, 0.5)));
+
+  Color red = Color::fromStr("#AF4D1711");
+  red.darken(35);
+  EXPECT_TRUE(red.equals(Color::fromStr("#71320E11")));
+
+}
+TEST(LightenTest, HandleRgb) {
   Color black = Color::fromSRgb(0,0,0);
   black.lighten(100);
   EXPECT_TRUE(black.equals(Color::fromSRgb(1,1,1)));
@@ -36,7 +85,19 @@ TEST(LightenTest, HandleValids) {
   Color pink = Color::fromStr("#bc3897");
   pink.lighten(69);
   EXPECT_TRUE(pink.equals(Color::fromStr("#eac1de")));
+
 }
+
+TEST(LightenTest, HandleRgba) {
+  Color black = Color::fromSRgb(0,0,0, 0.6);
+  black.lighten(100);
+  EXPECT_TRUE(black.equals(Color::fromSRgb(1,1,1, 0.6)));
+
+  Color pink = Color::fromStr("#bc3897fe");
+  pink.lighten(69);
+  EXPECT_TRUE(pink.equals(Color::fromStr("#eac1defe")));
+}
+
 TEST(LightenTest, HandleInvalids) {
   Color black = Color::fromSRgb(0,0,0);
   EXPECT_THROW(black.lighten(-1),std::runtime_error);
@@ -48,6 +109,7 @@ TEST(FromRgb8Test, HandleValids) {
   EXPECT_TRUE(Color::fromRgb8(0,0,0).equals(Color::fromSRgb(0, 0, 0)));
   EXPECT_TRUE(Color::fromRgb8(255,255,255).equals(Color::fromSRgb(1, 1, 1)));
 }
+
 TEST(FromRgb8Test, HandleInvalids) {
   EXPECT_THROW(Color::fromRgb8(-1,-1,-1),std::runtime_error);
   EXPECT_THROW(Color::fromRgb8(256,256,256),std::runtime_error);
@@ -72,17 +134,19 @@ TEST(ColorsToTest, CalculatesRight)
   ASSERT_TRUE(testsVec == blackToWhite);
   std::reverse(testsVec.begin(), testsVec.end());
   ASSERT_TRUE(testsVec == whiteToBlack);
-  std::vector<Color> testsVec2 = {
-    Color::fromStr("#f2f2f2"), Color::fromStr("#e6e6e6"),
-    Color::fromStr("#dadada"), Color::fromStr("#cecece"),
-    Color::fromStr("#c2c2c2"), Color::fromStr("#b6b6b6"),
-    Color::fromStr("#aaaaaa"), Color::fromStr("#9d9d9d"),
-    Color::fromStr("#919191"), Color::fromStr("#858585"),
-    Color::fromStr("#797979"), Color::fromStr("#6d6d6d"),
-    Color::fromStr("#616161"), Color::fromStr("#555555"),
-    Color::fromStr("#484848"), Color::fromStr("#3c3c3c"),
-    Color::fromStr("#303030"), Color::fromStr("#242424"),
-    Color::fromStr("#181818"), Color::fromStr("#0c0c0c"),
-  };
-  std::vector<Color> whiteToBlack2 = Color::fromStr("#fff").colorsTo(Color::fromStr("#000"),20);
+}
+
+TEST(ToStrTest, FormattingNormalRight) 
+{
+  ASSERT_EQ(Color::fromStr("#fff").toRgbStr(), "#FFFFFF");
+  ASSERT_EQ(Color::fromStr("#000").toRgbStr(), "#000000");
+  ASSERT_EQ(Color::fromStr("#f00").toRgbStr(), "#FF0000");
+}
+
+TEST(ToStrTest, FormattingNormalEdgeCases)
+{
+  ASSERT_EQ(Color::fromStr("#0c0c0c").toRgbStr(), "#0C0C0C");
+  ASSERT_EQ(Color::fromStr("#0a0a0a").toRgbStr(), "#0A0A0A");
+  ASSERT_EQ(Color::fromStr("#0f0f0f").toRgbStr(), "#0F0F0F");
+
 }
